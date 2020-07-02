@@ -22,9 +22,9 @@ Emqx增强插件（非官方）。
  }
 ```
 WEB接口实现必须返回如下格式：
-- 认证成功:`{"data":true}`
-- 认证失败:`{"data":false}`
-> 注意：默认值是`{"data":true}`
+- 认证成功: `webauth.success`的值
+- 认证失败: `webauth.failure`的值
+> 注意：默认值是`success`
 
 ### 3.点对点消息
 Topic满足该规则可被直接发送给某个客户端，而不需要订阅任何Topic:`$P2P/{ClientId}`。例如直接给ClientId为`bgyoujbh67ukbh7u`的客户端发送消息，直接在Topic后面加上即可:`$P2P/bgyoujbh67ukbh7u`。

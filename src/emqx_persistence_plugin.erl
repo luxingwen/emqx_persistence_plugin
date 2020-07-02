@@ -41,16 +41,15 @@ on_client_authenticate(#{clientid := ClientId, username := Username, password :=
                 Response =  send_http_request([{<<"client_id">>, F(ClientId)}, {<<"username">>, F(Username)}, {<<"password">>, F(Password)}]),
                 case Response of
                     {ok, {_Code, _Headers, Response}} ->
+                                                       Flag = application:get_env(?APP, success, "success"),
                                                         case Response of
-                                                            "{\"data\":true}"  ->
-                                                                {stop, AuthResult#{auth_result => success, anonymous => false}};
-                                                            _ ->
-                                                                {stop, AuthResult#{auth_result => not_authorized, anonymous => false}}
+                                                            Flag  ->
+                                                                  {stop, AuthResult#{auth_result => success, anonymous => false}};
+                                                            _     ->
+                                                                  {stop, AuthResult#{auth_result => not_authorized, anonymous => false}}
                                                         end;
-                                    {error, Reason} ->
+                    {_, Reason}                       ->
                                                         ?LOG(error, "Server unreached, reason is: ~p", [Reason]),
-                                                        {stop, AuthResult#{auth_result => not_authorized, anonymous => false}};
-                                                _ ->
                                                         {stop, AuthResult#{auth_result => not_authorized, anonymous => false}}
                 end;
         _ ->
