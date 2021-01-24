@@ -33,51 +33,34 @@ init_per_suite(Config) ->
 end_per_suite(_) ->
     ok.
 
-
 client_test(_Config) ->
-    {ok, C} = emqtt:start_link([{host, "127.0.0.1"} ,{clientid, <<"id1">>}]), 
+    {ok, C} = emqtt:start_link([{host, "127.0.0.1"} ,{clientid, <<"id1">>}]),
                                 % {clientid, <<"Id=001">>}, 
                                 % {username, <<"username=username">>},
                                 % {password, <<"password=password">>}]),
     {ok, _} = emqtt:connect(C),
-    timer:sleep(10),
     emqtt:subscribe(C, <<"test-topic0">>, qos0),
     emqtt:subscribe(C, <<"test-topic0">>),
-    timer:sleep(1000),
     emqtt:subscribe(C, <<"test-topic1">>, qos1),
     emqtt:subscribe(C, <<"test-topic1">>),
-    timer:sleep(1000),
     emqtt:subscribe(C, <<"test-topic2">>, qos2),
     emqtt:subscribe(C, <<"test-topic2">>),
-    timer:sleep(1000),
 
     emqtt:subscribe(C, <<"$P2P/">>),
     emqtt:subscribe(C, <<"$P2P/test-topic2">>),
-
-    timer:sleep(1000),
     emqtt:publish(C, <<"Topic0">>, <<"HaloWoaod0">>, qos0),
-    timer:sleep(1000),
     emqtt:publish(C, <<"Topic1">>, <<"HaloWoaod1">>, qos1),
-    timer:sleep(1000),
     emqtt:publish(C, <<"Topic2">>, <<"HaloWoaod2">>, qos2),
-    timer:sleep(1000),
     emqtt:publish(C, <<"$P2P/">>, <<"P2PMessage">>, qos2),
-    timer:sleep(1000),
     emqtt:publish(C, <<"$P2P/id1">>, <<"P2PMessage">>, qos2),
-    timer:sleep(1000),
     emqtt:publish(C, <<"$PERSISTENCE/">>, <<"DataHHHH">>, qos2),
-    timer:sleep(1000),
-    emqtt:disconnect(C),
-    timer:sleep(3000).
-
+    emqtt:disconnect(C).
 
 mysql_insert(_) ->
     V = ecpool:with_client(?APP, fun(Connection) -> 
                                 mysql:query(Connection, <<"select version()">>, []) 
                             end),
     io:format("Version:~p~n",[V]).
-    
-
 
 set_special_configs_ssl(_) ->
     
