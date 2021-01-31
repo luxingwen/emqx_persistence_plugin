@@ -6,72 +6,33 @@
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("common_test/include/ct.hrl").
 
-all() ->
-    [{group, normal},
-     {group, ssl}].
-
-groups() ->
-    Cases = [client_test, mysql_insert],
-    [{normal, [sequence], Cases},
-     {ssl, [sequence], Cases}].
-
-init_per_group(ssl, Config) ->
-    emqx_ct_helpers:start_apps([emqx_persistence_plugin], fun set_special_configs_ssl/1),
-    Config;
-
-init_per_group(normal, Config) ->
-    emqx_ct_helpers:start_apps([emqx_persistence_plugin], fun set_special_configs/1),
-    Config.
-
-end_per_group(_, Config) ->
-    emqx_ct_helpers:stop_apps([emqx_persistence_plugin]),
-    Config.
+all() -> emqx_ct:all(?MODULE).
 
 init_per_suite(Config) ->
+    emqx_ct_helpers:start_apps([emqx_persistence_plugin]),
     Config.
 
 end_per_suite(_) ->
+    emqx_ct_helpers:stop_apps([emqx_persistence_plugin]),
     ok.
 
-client_test(_Config) ->
-    {ok, C} = emqtt:start_link([{host, "127.0.0.1"} ,{clientid, <<"id1">>}]),
-                                % {clientid, <<"Id=001">>}, 
-                                % {username, <<"username=username">>},
-                                % {password, <<"password=password">>}]),
-    {ok, _} = emqtt:connect(C),
-    emqtt:subscribe(C, <<"test-topic0">>, qos0),
-    emqtt:subscribe(C, <<"test-topic0">>),
-    emqtt:subscribe(C, <<"test-topic1">>, qos1),
-    emqtt:subscribe(C, <<"test-topic1">>),
-    emqtt:subscribe(C, <<"test-topic2">>, qos2),
-    emqtt:subscribe(C, <<"test-topic2">>),
-
-    emqtt:subscribe(C, <<"$P2P/">>),
-    emqtt:subscribe(C, <<"$P2P/test-topic2">>),
-    emqtt:publish(C, <<"Topic0">>, <<"HaloWoaod0">>, qos0),
-    emqtt:publish(C, <<"Topic1">>, <<"HaloWoaod1">>, qos1),
-    emqtt:publish(C, <<"Topic2">>, <<"HaloWoaod2">>, qos2),
-    emqtt:publish(C, <<"$P2P/">>, <<"P2PMessage">>, qos2),
-    emqtt:publish(C, <<"$P2P/id1">>, <<"P2PMessage">>, qos2),
-    emqtt:publish(C, <<"$PERSISTENCE/">>, <<"DataHHHH">>, qos2),
-    emqtt:disconnect(C).
-
-mysql_insert(_) ->
-    V = ecpool:with_client(?APP, fun(Connection) -> 
-                                mysql:query(Connection, <<"select version()">>, []) 
-                            end),
-    io:format("Version:~p~n",[V]).
-
-set_special_configs_ssl(_) ->
-    
-    application:set_env(emqx, allow_anonymous, false),
-    application:set_env(emqx, enable_acl_cache, false),
-    Cfg = application:get_env(emqx_persistence_plugin, server, []),
-    SslCfg = [{ssl, {server_name_indication, disable},
-                    {cacertfile, emqx_ct_helpers:deps_path(emqx_persistence_plugin, "test/emqx_persistence_plugin_data/ca.pem")},
-                    {certfile, emqx_ct_helpers:deps_path(emqx_persistence_plugin, "test/emqx_persistence_plugin_data/client-cert.pem")},
-                    {keyfile, emqx_ct_helpers:deps_path(emqx_persistence_plugin, "test/emqx_persistence_plugin_data/client-key.pem")}}],
-    application:set_env(emqx_persistence_plugin, server, Cfg ++ SslCfg).
-
-set_special_configs(_) ->
-    ok.
+t_client_id_test(_Config) ->
+    {ok, C1} = emqtt:start_link([{host, "127.0.0.1"} ,
+                                 {clientid, <<"clientid1">>},
+                                 {username, <<"username">>},
+                                 {password, <<"password">>}]),
+    {ok, _} = emqtt:connect(C1),
+    {ok, C2} = emqtt:start_link([{host, "127.0.0.1"} ,
+                                 {clientid, <<"clientid2">>},
+                                 {username, <<"username">>},
+                                 {password, <<"password">>}]),
+    {ok, _} = emqtt:connect(C2),
+    emqtt:subscribe(C2, <<"$WITH_CLIENTID/test">>, qos0),
+    emqtt:publish(C1, <<"$WITH_CLIENTID/test">>, <<"ok">>, qos2),
+    receive
+        {publish, #message{topic = <<"$WITH_CLIENTID/test">>,
+                           payload = Payload}} -> <<"clientid1#ok">> = Payload;
+        _ -> ok
+    end,
+    emqtt:disconnect(C1),
+    emqtt:disconnect(C2).

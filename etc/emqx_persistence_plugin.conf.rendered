@@ -1,52 +1,27 @@
 ##--------------------------------------------------------------------
-## Web authenticate Confifg
-##--------------------------------------------------------------------
-##
-## Auth url: Web interface will receive a post JSON request:
-## {
-##    "username":"your-username",
-##    "password":"your-password",
-##    "client_id":"your-clientid"
-## }
-##
-## Then your interface must return one of
-## 1. {"data":true} for auth success
-## 2. {"data":false} for auth failure
-## Notice: default value is  {"data":true}
-
-##
-## Enable webauth:
-## Value: on | off,default is off 
-persistence.webauth = off
-
-##
-## Webauth url
-##
-persistence.webauth.url = http://localhost:2500
-##--------------------------------------------------------------------
 ## Hook Confifg
 ##--------------------------------------------------------------------
 
 ##
 ## Connect hook
 ##
-emqx_persistence_plugin.hook.client.connected.1     = {"action": "on_client_connected"}
+emqx_persistence_plugin.hook.client.connected.1 = {"action": "on_client_connected"}
 ##
 ## Disconnected hook
 ##
-emqx_persistence_plugin.hook.client.disconnected.1  = {"action": "on_client_disconnected"}
+emqx_persistence_plugin.hook.client.disconnected.1 = {"action": "on_client_disconnected"}
 ##
 ## Subscribe hook
 ##
-emqx_persistence_plugin.hook.client.subscribe.1     = {"action": "on_client_subscribe", "topic": "#"}
+emqx_persistence_plugin.hook.client.subscribe.1 = {"action": "on_client_subscribe", "topic": "#"}
 ##
 ## Unsubscribe hook
 ##
-emqx_persistence_plugin.hook.client.unsubscribe.1   = {"action": "on_client_unsubscribe", "topic": "#"}
+emqx_persistence_plugin.hook.client.unsubscribe.1 = {"action": "on_client_unsubscribe", "topic": "#"}
 ##
 ## Publish hook
 ##
-emqx_persistence_plugin.hook.message.publish.1      = {"action": "on_message_publish", "topic": "#"}
+emqx_persistence_plugin.hook.message.publish.1 = {"action": "on_message_publish", "topic": "#"}
 
 
 ##--------------------------------------------------------------------

@@ -89,14 +89,33 @@ on_client_unsubscribe(#{clientid := _ClientId, username := _Username}, _Properti
 %%--------------------------------------------------------------------
 on_message_publish(Message = #message{topic = <<"$SYS/", _/binary>>}, _Env) ->
     {ok, Message};
+
+%% Append clientId
+on_message_publish(#message{id = MsgId,
+                            qos = Qos,
+                            topic = <<"$WITH_CLIENTID/",_/binary>> = Topic,
+                            from = From,
+                            flags = Flags,
+                            headers = Headers,
+                            payload = Payload,
+                            timestamp = Ts}, _Env) ->
+    NewMessage = #message{id = MsgId,
+                          qos = Qos,
+                          topic = Topic,
+                          from = From,
+                          flags = Flags,
+                          headers = Headers,
+                          payload = <<From/binary, "#", Payload/binary>>,
+                          timestamp = Ts},
+    {ok, NewMessage};
 % persitences to mysql
-on_message_publish(Message = #message{id = <<I1:64, I2:48, I3:16>> = _MsgId, 
+on_message_publish(Message = #message{id = <<I1:64, I2:48, I3:16>> = _MsgId,
                                       qos = Qos, 
-                                      topic = <<"$PERSISTENCE/", _/binary>> = Topic, 
+                                      topic = <<"$PERSISTENCE/", _/binary>> = Topic,
                                       from = From,
-                                      flags = #{dup := Dup, retain := Retain}, 
+                                      flags = #{dup := Dup, retain := Retain},
                                       headers = #{peerhost := {B1, B2, B3, B4}, username := Username},
-                                      payload = Payload, 
+                                      payload = Payload,
                                       timestamp = Ts},
                                       _Env) ->
     emqx_metrics:inc('emqx_persistence_plugin.message_publish'),
@@ -127,7 +146,7 @@ on_message_publish(Message = #message{ topic =  <<"$P2P/", PeerClientId/binary>>
                                 ChannelPid ! {deliver, <<"$P2P/", PeerClientId/binary>>, P2PMessage},
                                 {ok, Message};
                         []-> 
-                                {stop, #message{headers = #{allow_publish => false}} }
+                                {stop, #message{headers = #{allow_publish => false}}}
                     end;
                 _ ->
                     {stop, #message{headers = #{allow_publish => false}} }

@@ -1,13 +1,14 @@
-# emqx_persistence_plugin
-Emqx增强插件（非官方）。
+# emqx_persistence_plugin ：Emqx增强插件（非官方）
 ## 1.简介
 本插件是一个EMQX社区版的持久化数据的增强插件，社区出品，非官方。当前支持EMQX4.0以上版本。
+
 ## 2.配置
 配置文件分为两部分：
 1. 持久化的数据源：你要持久化的数据源，一般不要动
 2. Mysql连接配置：MySql客户端配置，IP端口，SSL等
 ## 3.安装
 参考这里：https://docs.emqx.io/broker/latest/cn/advanced/plugins.html
+
 ## 4.功能介绍
 ### 1.Mysql持久化数据
 1. 对`$PERSISTENCE/`开头的Topic，发送的任何消息被持久化到Mysql;
@@ -20,6 +21,10 @@ Topic满足该规则可被直接发送给某个客户端，而不需要订阅任
 - client_id 不可空
 - `$P2P/`不可订阅
 - ClientId中不可带非法字符:`/ * # +`
+
+### 4.自动追加ClientId
+以 `$WITH_CLIENTID/` 开头的Topic，消息Payload会被添加发送方的ClientId，ClientId会被加到Payload最前面以一个 `#` 分割。
+例如A客户端 `c1` 给 `$WITH_CLIENTID/test` 发送了一个消息：`ok` ，如果有客户端订阅，受到的消息为 `c1#ok`。
 
 ## 社区
 - QQ群：475512169
