@@ -39,4 +39,4 @@ insert(publish, Params) ->
 query(Sql, Params) when is_list(Params) ->
     ecpool:with_client(?APP, fun(Connection) -> 
                                 mysql:query(Connection, Sql, Params) 
-                            end).
+                             end).

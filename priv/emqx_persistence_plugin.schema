@@ -148,10 +148,10 @@ end}.
             CA = cuttlefish:conf_get("persistence.mysql.ssl.cafile", Conf),
             Cert = cuttlefish:conf_get("persistence.mysql.ssl.certfile", Conf),
             Key = cuttlefish:conf_get("persistence.mysql.ssl.keyfile", Conf),
-            Options ++ [{ssl, {server_name_indication, disable},
-                              {cacertfile, CA},
-                              {certfile, Cert},
-                              {keyfile, Key}}];
+            Options ++ [{ssl, [{server_name_indication, disable},
+                               {cacertfile, CA},
+                               {certfile, Cert},
+                               {keyfile, Key}]}];
         _ ->
             Options
   end
