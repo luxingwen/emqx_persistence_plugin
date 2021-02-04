@@ -16,7 +16,7 @@ end_per_suite(_) ->
     emqx_ct_helpers:stop_apps([emqx_persistence_plugin]),
     ok.
 
-t_client_id_test(_Config) ->
+t_client_id_test(_) ->
     {ok, C1} = emqtt:start_link([{host, "127.0.0.1"} ,
                                  {clientid, <<"clientid1">>},
                                  {username, <<"username">>},
@@ -36,3 +36,13 @@ t_client_id_test(_Config) ->
     end,
     emqtt:disconnect(C1),
     emqtt:disconnect(C2).
+
+t_save_to_mysql(_) ->
+    {ok, C1} = emqtt:start_link([{host, "127.0.0.1"} ,
+                                 {clientid, <<"clientid1">>},
+                                 {username, <<"username">>},
+                                 {password, <<"password">>}]),
+    {ok, _} = emqtt:connect(C1),
+    emqtt:publish(C1, <<"$PERSISTENCE/test">>, <<"ok">>, qos2),
+    emqtt:disconnect(C1),
+    ok.

@@ -95,23 +95,7 @@ end}.
   {default, ""},
   {datatype, string}
 ]}.
-{mapping, "persistence.webauth", "emqx_persistence_plugin.webauth", [
-  {default, "off"},
-  {datatype, flag}
-]}.
 
-{mapping, "persistence.webauth.url", "emqx_persistence_plugin.auth_url", [
-  {default, ""},
-  {datatype, string}
-]}.
-{mapping, "persistence.webauth.success", "emqx_persistence_plugin.success", [
-  {default, "success"},
-  {datatype, string}
-]}.
-{mapping, "persistence.webauth.failure", "emqx_persistence_plugin.failure", [
-  {default, "failure"},
-  {datatype, string}
-]}.
 {translation, "emqx_persistence_plugin.server", fun(Conf) ->
   {MyHost, MyPort} =
   case cuttlefish:conf_get("persistence.mysql.server", Conf) of
