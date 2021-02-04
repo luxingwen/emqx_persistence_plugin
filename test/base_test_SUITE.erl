@@ -36,3 +36,6 @@ t_client_id_test(_Config) ->
     end,
     emqtt:disconnect(C1),
     emqtt:disconnect(C2).
+
+t_save_to_mysql(_) ->
+    ok.
