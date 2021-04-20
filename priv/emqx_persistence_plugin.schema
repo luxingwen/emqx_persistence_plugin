@@ -1,5 +1,10 @@
 %%-*- mode: erlang -*-
 
+{mapping, "emqx_persistence_plugin.enable_persistence", "emqx_persistence_plugin.enable_persistence", [
+  {datatype, flag},
+  {default, off}
+]}.
+
 {mapping, "emqx_persistence_plugin.hook.client.connected.$name", "emqx_persistence_plugin.hooks", [
   {datatype, string}
 ]}.
@@ -118,26 +123,28 @@ end}.
                   end
             end,
   Options = [{pool_size, Pool},
-              {auto_reconnect, 1},
-              {host, MyHost},
-              {port, MyPort},
-              {user, Username},
-              {password, Passwd},
-              {database, DB},
-              {encoding, utf8},
-              {query_timeout, Timeout},
-              {keep_alive, true}],
+             {auto_reconnect, 1},
+             {host, MyHost},
+             {port, MyPort},
+             {user, Username},
+             {password, Passwd},
+             {database, DB},
+             {encoding, utf8},
+             {query_timeout, Timeout},
+             {keep_alive, true}],
+  Enable = cuttlefish:conf_get("enable_persistence.enable", Conf, off),
   case cuttlefish:conf_get("persistence.mysql.ssl", Conf) of
         true ->
             CA = cuttlefish:conf_get("persistence.mysql.ssl.cafile", Conf),
             Cert = cuttlefish:conf_get("persistence.mysql.ssl.certfile", Conf),
             Key = cuttlefish:conf_get("persistence.mysql.ssl.keyfile", Conf),
-            Options ++ [{ssl, [{server_name_indication, disable},
-                               {cacertfile, CA},
-                               {certfile, Cert},
-                               {keyfile, Key}]}];
+            NewsOptions = Options ++ [{ssl, [{server_name_indication, disable},
+                                             {cacertfile, CA},
+                                             {certfile, Cert},
+                                             {keyfile, Key}]}],
+            [{enable, Enable},{options, NewsOptions}];
         _ ->
-            Options
+            [{enable, Enable},{options, Options}]
   end
 end}.
 

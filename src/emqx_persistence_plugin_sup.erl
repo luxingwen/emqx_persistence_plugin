@@ -14,7 +14,12 @@
 start_link() ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
-init([]) ->
-    {ok, ServerCfg} = application:get_env(?APP, server),
-    PoolSpec = ecpool:pool_spec(?APP, ?APP, ?ECPOOL_WORKER, ServerCfg),
-    {ok, {{one_for_one, 10, 100}, [PoolSpec]}}.
+init(_) ->
+    case application:get_env(?APP, enable_persistence) of
+        true ->
+            {ok, ServerCfg} = application:get_env(?APP, server),
+            PoolSpec = ecpool:pool_spec(?APP, ?APP, ?ECPOOL_WORKER, ServerCfg),
+            {ok, {{one_for_one, 10, 100}, [PoolSpec]}};
+        false ->
+            {ok, {{one_for_one, 10, 100}, []}}
+    end.
