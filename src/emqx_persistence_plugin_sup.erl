@@ -16,10 +16,10 @@ start_link() ->
 
 init(_) ->
     case application:get_env(?APP, enable_persistence) of
-        true ->
+        {ok, true} ->
             {ok, ServerCfg} = application:get_env(?APP, server),
             PoolSpec = ecpool:pool_spec(?APP, ?APP, ?ECPOOL_WORKER, ServerCfg),
             {ok, {{one_for_one, 10, 100}, [PoolSpec]}};
-        false ->
+        _ ->
             {ok, {{one_for_one, 10, 100}, []}}
     end.
