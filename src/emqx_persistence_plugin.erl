@@ -2,12 +2,12 @@
 
 -include("emqx_persistence_plugin.hrl").
 -include_lib("emqx/include/emqx.hrl").
+-include_lib("emqx/include/logger.hrl").
 
 -export([ register_metrics/0, load/0, unload/0]).
 -export([ on_client_connected/3, on_client_disconnected/4]).
 -export([ on_message_publish/2]).
 -export([ on_client_subscribe/4, on_client_unsubscribe/4]).
--define(LOG(Level, Format, Args), emqx_logger:Level("emqx_persistence_plugin: " ++ Format, Args)).
 
 register_metrics() ->
     [emqx_metrics:new(MetricName)
