@@ -1,4 +1,7 @@
-# emqx_persistence_plugin ：Emqx增强插件（非官方）
+# emqx_persistence_plugin ：Emqx增强插件
+## 0.说明
+从 `EMQX v4.3.8` 开始, 插件的使用和之前稍微有点区别，因此这里需要注意一下，该插件仅适用于`v4.3.8`。
+
 ## 1.简介
 本插件是一个EMQX社区版的持久化数据的增强插件，社区出品，非官方。当前支持EMQX4.0以上版本。
 
@@ -7,7 +10,24 @@
 1. 持久化的数据源：你要持久化的数据源，一般不要动
 2. Mysql连接配置：MySql客户端配置，IP端口，SSL等
 ## 3.安装
-参考这里：https://docs.emqx.io/broker/latest/cn/advanced/plugins.html
+- git clone emqx的源码;
+- 切换到 `v4.3.8` tag;
+- 首先把代码复制到本地，然后移动到emqx源码目录下的 `apps` 目录下；
+- 执行构建。
+
+整个过程需要的命令如下：
+```sh
+git clone https://github.com/emqx/emqx.git
+cd emqx
+git fetch origin v4.3.8:v4.3.8
+git checkout v4.3.8
+cd apps
+git clone https://github.com/luxingwen/emqx-persistence-plugin.git
+cd ..
+make
+
+```
+> 注意：本插件不能单独编译，因为依赖了 EMQX 的库。
 
 ## 4.功能介绍
 ### 1.Mysql持久化数据
@@ -28,4 +48,4 @@ Topic满足该规则可被直接发送给某个客户端，而不需要订阅任
 
 ## 社区
 - QQ群：475512169
-- 博客：https://openlab.ezlinker.cn
+- 博客：https://wwhai.github.io
