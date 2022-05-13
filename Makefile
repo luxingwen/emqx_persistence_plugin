@@ -30,6 +30,6 @@ $(CUTTLEFISH_SCRIPT):
 	@${REBAR} get-deps
 	@if [ ! -f cuttlefish ]; then make -C _build/default/lib/cuttlefish; fi
 
-app.config: $(CUTTLEFISH_SCRIPT) etc/emqx_persistence_plugin.conf
-	$(verbose) $(CUTTLEFISH_SCRIPT) -l info -e etc/ -c etc/emqx_persistence_plugin.conf -i priv/emqx_persistence_plugin.schema -d data
+app.config: $(CUTTLEFISH_SCRIPT) etc/emqx_persistence_mysql.conf
+	$(verbose) $(CUTTLEFISH_SCRIPT) -l info -e etc/ -c etc/emqx_persistence_mysql.conf -i priv/emqx_persistence_mysql.schema -d data
 
