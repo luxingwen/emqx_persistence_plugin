@@ -1,0 +1,11 @@
+{application, emqx_persistence_mysql,
+ [{description, "Data to mysql plugin"},
+  {vsn, "git"},
+  {modules, []},
+  {registered, [emqx_persistence_mysql_sup]},
+  {mod, {emqx_persistence_mysql_app, []}},
+  {applications, [kernel,stdlib,mysql,ecpool]},
+  {env,[]},
+  {licenses, ["Apache 2.0"]},
+  {links, ["https://openlab.ezlinker.cn"]}
+ ]}.

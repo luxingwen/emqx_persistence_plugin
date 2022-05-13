@@ -1,0 +1,97 @@
+%%-*- mode: erlang -*-
+
+{mapping, "persistence.mysql.server", "emqx_persistence_mysql.server", [
+  {default, {"127.0.0.1", 3306}},
+  {datatype, [integer, ip, string]}
+]}.
+
+{mapping, "persistence.mysql.pool", "emqx_persistence_mysql.server", [
+  {default, 8},
+  {datatype, integer}
+]}.
+
+{mapping, "persistence.mysql.username", "emqx_persistence_mysql.server", [
+  {default, ""},
+  {datatype, string}
+]}.
+
+{mapping, "persistence.mysql.password", "emqx_persistence_mysql.server", [
+  {default, ""},
+  {datatype, string}
+]}.
+
+{mapping, "persistence.mysql.database", "emqx_persistence_mysql.server", [
+  {default, "mqtt"},
+  {datatype, string}
+]}.
+
+{mapping, "persistence.mysql.query_timeout", "emqx_persistence_mysql.server", [
+  {default, ""},
+  {datatype, string}
+]}.
+
+{mapping, "persistence.mysql.ssl", "emqx_persistence_mysql.server", [
+  {default, off},
+  {datatype, flag}
+]}.
+
+{mapping, "persistence.mysql.ssl.cafile", "emqx_persistence_mysql.server", [
+  {default, ""},
+  {datatype, string}
+]}.
+
+{mapping, "persistence.mysql.ssl.certfile", "emqx_persistence_mysql.server", [
+  {default, ""},
+  {datatype, string}
+]}.
+
+{mapping, "persistence.mysql.ssl.keyfile", "emqx_persistence_mysql.server", [
+  {default, ""},
+  {datatype, string}
+]}.
+
+{translation, "emqx_persistence_mysql.server", fun(Conf) ->
+  {MyHost, MyPort} =
+  case cuttlefish:conf_get("persistence.mysql.server", Conf) of
+    {Ip, Port} -> {Ip, Port};
+    S          -> case string:tokens(S, ":") of
+                    [Domain]       -> {Domain, 3306};
+                    [Domain, Port] -> {Domain, list_to_integer(Port)}
+                  end
+    end,
+  Pool = cuttlefish:conf_get("persistence.mysql.pool", Conf),
+  Username = cuttlefish:conf_get("persistence.mysql.username", Conf),
+  Passwd = cuttlefish:conf_get("persistence.mysql.password", Conf),
+  DB = cuttlefish:conf_get("persistence.mysql.database", Conf),
+  Timeout = case cuttlefish:conf_get("persistence.mysql.query_timeout", Conf) of
+                "" -> 300000;
+                Duration ->
+                  case cuttlefish_duration:parse(Duration, ms) of
+                      {error, Reason} -> error(Reason);
+                      Ms when is_integer(Ms) -> Ms
+                  end
+            end,
+  Options = [{pool_size, Pool},
+             {auto_reconnect, 1},
+             {host, MyHost},
+             {port, MyPort},
+             {user, Username},
+             {password, Passwd},
+             {database, DB},
+             {encoding, utf8},
+             {query_timeout, Timeout},
+             {keep_alive, true}],
+  case cuttlefish:conf_get("persistence.mysql.ssl", Conf) of
+        true ->
+            CA = cuttlefish:conf_get("persistence.mysql.ssl.cafile", Conf),
+            Cert = cuttlefish:conf_get("persistence.mysql.ssl.certfile", Conf),
+            Key = cuttlefish:conf_get("persistence.mysql.ssl.keyfile", Conf),
+            [{ssl, [{server_name_indication, disable},
+                                             {cacertfile, CA},
+                                             {certfile, Cert},
+                                             {keyfile, Key}]}];
+        _ ->
+            Options
+  end
+end}.
+
